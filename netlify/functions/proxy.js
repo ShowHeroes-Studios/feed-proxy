@@ -2,6 +2,7 @@ const https = require("https");
 const { getStore } = require("@netlify/blobs");
 
 const DEFAULT_TTL_MS = 2 * 60 * 1000;
+const MAX_TTL_MS = 30 * 60 * 1000;
 
 const noopCache = {
   get: async () => null,
@@ -21,7 +22,7 @@ exports.handler = async (event) => {
 
   const queryParams = { ...(event.queryStringParameters || {}) };
   const targetUrl = queryParams.url;
-  const ttlMs = queryParams.ttl ? Number(queryParams.ttl) * 1000 : DEFAULT_TTL_MS;
+  const ttlMs = Math.min(queryParams.ttl ? Number(queryParams.ttl) * 1000 : DEFAULT_TTL_MS, MAX_TTL_MS);
   delete queryParams.url;
   delete queryParams.ttl;
 
