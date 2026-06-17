@@ -48,14 +48,31 @@ exports.handler = async (event) => {
     };
   }
 
-  const body = await new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = "";
-      res.on("data", (chunk) => (data += chunk));
-      res.on("end", () => resolve(data));
-      res.on("error", reject);
+  let body;
+  try {
+    body = await new Promise((resolve, reject) => {
+      const req = https.get(url, (res) => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          res.resume();
+          return reject(new Error(`Upstream returned ${res.statusCode}`));
+        }
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve(data));
+        res.on("error", reject);
+      });
+      req.on("error", reject);
+      req.setTimeout(10000, () => {
+        req.destroy(new Error("Upstream request timed out"));
+      });
     });
-  });
+  } catch (err) {
+    return {
+      statusCode: 502,
+      headers: corsHeaders,
+      body: `Upstream fetch failed: ${err.message}`,
+    };
+  }
 
   await cache.setJSON(url, { body, cachedAt: Date.now() }).catch(() => null);
 
