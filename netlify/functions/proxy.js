@@ -2,7 +2,6 @@ const https = require("https");
 const { getStore } = require("@netlify/blobs");
 
 const DEFAULT_TTL_MS = 2 * 60 * 1000;
-const ALLOWED_DOMAIN = "showheroes.com";
 
 const noopCache = {
   get: async () => null,
@@ -10,19 +9,8 @@ const noopCache = {
 };
 
 exports.handler = async (event) => {
-  const origin = event.headers["origin"] || event.headers["referer"] || "";
-  const originHost = origin ? new URL(origin).hostname : "";
-  const isAllowed =
-    originHost === "localhost" ||
-    originHost === "127.0.0.1" ||
-    originHost.endsWith(`.${ALLOWED_DOMAIN}`) ||
-    originHost === ALLOWED_DOMAIN;
-  if (!isAllowed) {
-    return { statusCode: 403, body: "Forbidden: origin not allowed" };
-  }
-
   const corsHeaders = {
-    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
