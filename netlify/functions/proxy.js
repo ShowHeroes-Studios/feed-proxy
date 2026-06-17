@@ -30,8 +30,10 @@ exports.handler = async (event) => {
   }
 
   const parsedUrl = new URL(targetUrl);
-  const params = new URLSearchParams(queryParams);
-  const url = `${parsedUrl.origin}${parsedUrl.pathname}?${params.toString()}`;
+  for (const [key, value] of Object.entries(queryParams)) {
+    parsedUrl.searchParams.set(key, value);
+  }
+  const url = parsedUrl.toString();
 
   let cache;
   try {
