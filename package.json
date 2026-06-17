@@ -1,0 +1,13 @@
+{
+  "name": "feed-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "ShowHeroes",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.9"
+  }
+}
