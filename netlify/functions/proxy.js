@@ -39,7 +39,8 @@ exports.handler = async (event) => {
   let cache;
   try {
     cache = getStore("proxy-cache");
-  } catch {
+  } catch (err) {
+    console.error("getStore failed:", err.message);
     cache = noopCache;
   }
   const cached = await cache.get(url, { type: "json" }).catch(() => null);
@@ -85,7 +86,7 @@ exports.handler = async (event) => {
     };
   }
 
-  await cache.setJSON(url, { body, cachedAt: Date.now() }).catch(() => null);
+  await cache.setJSON(url, { body, cachedAt: Date.now() }).catch((err) => console.error("Cache write failed:", err.message));
 
   return {
     statusCode: 200,
