@@ -54,7 +54,7 @@ exports.handler = async (event) => {
   let body;
   try {
     body = await new Promise((resolve, reject) => {
-      const req = https.get(url, (res) => {
+      const req = https.get(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; feed-proxy/1.0)" } }, (res) => {
         if (res.statusCode < 200 || res.statusCode >= 300) {
           res.resume();
           return reject(new Error(`Upstream returned ${res.statusCode}`));
@@ -70,6 +70,14 @@ exports.handler = async (event) => {
       });
     });
   } catch (err) {
+    console.error(`Upstream fetch failed for ${url}: ${err.message}`);
+    if (cached) {
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+        body: cached.body,
+      };
+    }
     return {
       statusCode: 502,
       headers: corsHeaders,
