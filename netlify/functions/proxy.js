@@ -36,6 +36,11 @@ exports.handler = async (event) => {
   }
   const url = parsedUrl.toString();
 
+  console.log("Blob env check:", {
+    hasContext: !!process.env.NETLIFY_BLOBS_CONTEXT,
+    hasSiteID: !!process.env.NETLIFY_SITE_ID,
+    hasToken: !!process.env.NETLIFY_TOKEN,
+  });
   let cache;
   try {
     cache = getStore("proxy-cache");
